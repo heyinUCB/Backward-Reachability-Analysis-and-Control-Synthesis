@@ -1,4 +1,4 @@
-%% Reachability Analysis: Nonlinear Time Invariant system.
+%% Reachability Analysis
 function [gamma_list, Vval, u1val, u2val] = ...
     CLF(dynamics, T, x, t, rt, V0val, max_iter, uM, um, epsilon)
 warning off
@@ -9,7 +9,7 @@ um1 = um(1);
 uM2 = uM(2);
 um2 = um(2);
 
-%% load the scaled system
+%% load the system
 f = dynamics.f;
 g1 = dynamics.g1;
 g2 = dynamics.g2;
@@ -22,14 +22,14 @@ rt4 = rt.rt4;
 rt5 = rt.rt5;
 rt6 = rt.rt6;
 
-%% Define storage function V(t, x) = V0(x) + tV1(x)
-Vdeg = 4;
+%% Define storage function V(t,x)
+Vdeg = 2;
 Vmonom = monomials([x; t], 0:Vdeg);
 V = polydecvar('V', Vmonom, 'vec');
 DVx = jacobian(V, x);
 DVt = jacobian(V, t);
 
-%% Define s(x) and s'(x)
+%% Define multipliers
 sdeg = 2;
 % monomials
 sxmonom = monomials(x, 0:sdeg);
@@ -80,7 +80,7 @@ for i = 1:max_iter
     if i == 1
         Vval = V0val;
     else
-        % s1, s3, l, alpha, gamma are fixed
+        % gamma is fixed
         SOScons1 = ...
             [s1;s2;...
             s4a-epsilon;...
@@ -125,7 +125,7 @@ for i = 1:max_iter
     
     disp('%%%%%%%%%%%%%%%%%%%%%%%% gamma step %%%%%%%%%%%%%%%%%%%%%%%%%%%')
     disp('gamma step starts')
-    % V is given, maximize gamma over s2 s3 and l(t,x)
+    % V is given, maximize gamma 
     % Solve the SOS feasibility problem
     DVxval = jacobian(Vval, x);
     DVtval = jacobian(Vval, t);

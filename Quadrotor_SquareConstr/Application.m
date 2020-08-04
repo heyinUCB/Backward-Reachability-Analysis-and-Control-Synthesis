@@ -32,10 +32,6 @@ dynamics.g1 = g1;
 dynamics.g2 = g2;
 
 %% target function
-% x_rt_center = [0; 0; 0; 0; 0; 0];
-% rt = (x-x_rt_center)'*...
-%     blkdiag(1/1.7^2, 1/0.85^2, 1/0.8^2, 1/1^2, 1/(pi/12)^2, 1/(pi/2)^2)*...
-%     (x-x_rt_center) - 1;
 rt.rt1 = (1.7 - x1)*(x1 + 1.7);
 rt.rt2 = (0.85 - x2)*(x2 + 0.85);
 rt.rt3 = (0.8 - x3)*(x3 + 0.8);
@@ -45,7 +41,7 @@ rt.rt6 = (pi/2 - x6)*(x6 + pi/2);
 
 %% Initialize
 timer = tic;
-P = Vinitialize2;
+P = Vinitialize;
 V0val = x'*P*x;
 % load('V2u2.mat','Vval')
 % V0val = Vval;

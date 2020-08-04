@@ -1,45 +1,38 @@
-clear
-format long
- 
-%%
-x = sdpvar(6,1);
-x1 = x(1); 
-x2 = x(2); 
-x3 = x(3); 
-x4 = x(4); 
-x5 = x(5); 
-x6 = x(6); 
+function P = Vinitialize
+syms x1 x2 x3 x4 x5 x6 u1 u2
+x = [x1; x2; x3; x4; x5; x6];
+u = [u1; u2];
+% parameters
 g = 9.81;
-L = 0.25;
-I = 0.00383;
-m = 0.486;
-f = [x2; 0; x4; -g; x6; 0];
-g1 = [0; (0.16*x5^3-x5)/m; 0; (-0.47*x5^2+1)/m; 0; -L/I];
-g2 = [0; (0.16*x5^3-x5)/m; 0; (-0.47*x5^2+1)/m; 0; L/I];
+K = 0.89/1.4;
+d0 = 70;
+d1 = 17;
+n0 = 55;
 
-%% Define storage function V(t, x) = V0(x) + tV1(x)
-Vdeg = 2;
-% Vmonom = monolist(x, Vdeg);
-% Vcoeff = sdpvar(size(Vmonom,1),1);
-% V = Vcoeff'*Vmonom;
-[V, Vcoeff] = polynomial(x, Vdeg);
-DVx = jacobian(V, x);
+% nonlinear dynamics
+xdot = [x3; x4; u1*K*sin(x5); ...
+        u1*K*cos(x5)-g; x6; ...
+        -d0*x5-d1*x6+n0*u2];
+Apre = jacobian(xdot,x);
+Bpre = jacobian(xdot,u);
 
-%% Define s(x) and s'(x)
-sdeg = 2;
-[l1,cl1] = polynomial(x, sdeg);
-[l2,cl2] = polynomial(x, sdeg);
-[s1, c1] = polynomial(x, sdeg);
+% equilibriums
+xbar = zeros(6,1);
+ubar = [g/K; 0];
 
-%% Main algorithm
-SOScons = [sos(-DVx*f + l1*DVx*g1 + l2*DVx*g2);...
-    sos(V - 0.0001)...
-    ];
+% substitute in the value of equilibrium
+A = double(subs(subs(Apre,x,xbar),u,ubar));
+B = double(subs(subs(Bpre,x,xbar),u,ubar));
+Co = ctrb(A,B);
 
-obj = [];
-options = sdpsettings('verbose',1,'solver','penbmi');
-options.penbmi.PBM_MAX_ITER = 50;
-solvesos(SOScons,obj,options,[Vcoeff;cl1;cl2])
+% Q = diag([20 10 20 10 20 10]);
+% R = diag([100 100]);
+% K = lqr(A,B,Q,R);
+% 
+% P = lyap((A-B*K)',10*eye(6));
 
-%%
-V0coeffval = value(Vcoeff);
+Q = diag([10 10 10 10 10 10]);
+R = diag([100 100]);
+K = lqr(A,B,Q,R);
+
+P = lyap((A-B*K)',10*eye(6));
