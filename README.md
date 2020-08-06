@@ -13,3 +13,6 @@ There are three packages required:
 
 ## Way of Using the Code
 Go to each example folder, and run the file **Application.m**
+
+## BRS inner-approximations for a 6-state quadrotor
+![quadrotor](Quadrotor_SquareConstr/quadrotor.jpg)
