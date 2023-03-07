@@ -137,9 +137,6 @@ for i = 1:max_iter
     go = 1;
     while (num_exp <= 12 || go)
         num_exp = num_exp + 1;
-        if num_exp >= 20
-            break
-        end
         gamma_try = (gamma_ub + gamma_lb)/2
         SOScons2 = ...
             [s2;s3;...
